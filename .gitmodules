@@ -1,0 +1,3 @@
+[submodule "modules/gateways/Mercury/mercury-cash-sdk"]
+	path = modules/gateways/Mercury/mercury-cash-sdk
+	url = https://bitbucket.org/2vmodules/mercury-cash-sdk/src/master/
