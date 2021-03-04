@@ -1,20 +1,20 @@
-##Mercury Payment WHMCS Module
+## Mercury Payment WHMCS Module
 
-#####1.Clone repo with --recursive flag
-
-git clone git@github.com:mercurycash/gate-WHMCS.git --recursive
-
-#####2. Open in terminal
-
-* cd /modules/Mercury/mecury-cach-sdk directory
-* composer install --no-dev
-
-##### 3. Go back to the main directory of repo
-######Copy all files to your WHMСS root directory  
-
-cp -R * /var/www/html/whmcs
+ 1. Clone repo with --recursive flag
  
-#####4. Open gateways plugins page at admin part of WHMCS and activate plugin. 
+    `git clone git@github.com:mercurycash/gate-WHMCS.git --recursive    `
+      
+ 2. Open in terminal
+
+        1. `cd /modules/gateways/Mercury/mercury-cash-sdk` 
+
+        2. `composer install --no-dev`
+        
+ 3. Go back to the main directory of repo.Copy all files to your WHMСS root directory  
+
+        `sudo cp -R * /var/www/html/whmcs` 
+        
+ 4. Open gateways plugins page at admin part of WHMCS, activate plugin,set up Public key and Secret key. . 
 
 
 
