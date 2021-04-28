@@ -175,6 +175,12 @@ HTML;
         }
     }
 
+    $settings_array['checkStatusInterval'] = array(
+        'FriendlyName' => 'Check Status Interval',
+        'Description'  => 'milliseconds',
+        'Type'         => 'text',
+        'Default' => '2000',
+    );
 
         // a password field type allows for masked text input
     $settings_array['testMode'] = array(

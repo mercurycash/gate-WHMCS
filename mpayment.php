@@ -59,25 +59,22 @@ $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-	$mail = htmlspecialchars(isset($_REQUEST['mail']) ? $_REQUEST['mail'] : "");
-	$crypto = htmlspecialchars(isset($_REQUEST['crypto']) ? $_REQUEST['crypto'] : "");
+	$email = htmlspecialchars(isset($_REQUEST['email']) ? $_REQUEST['email'] : false);
+	$crypto = htmlspecialchars(isset($_REQUEST['crypto']) ? $_REQUEST['crypto'] : false);
+	$currency = htmlspecialchars(isset($_REQUEST['currency']) ? $_REQUEST['currency'] : false);
+	$price = htmlspecialchars(isset($_REQUEST['price']) ? $_REQUEST['price'] : false);
 
-	$order_id = htmlspecialchars(isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : "");
-	$amount = htmlspecialchars(isset($_REQUEST['amount']) ? $_REQUEST['amount'] : "");
-	$currency = htmlspecialchars(isset($_REQUEST['currency']) ? $_REQUEST['currency'] : "");
-
-	$order_hash = htmlspecialchars(isset($_REQUEST['order_hash']) ? $_REQUEST['order_hash'] : "");
-
-	$order_info = new stdClass();
-	$order_info->id_order = $order_id;
-	$order_info->value = $amount;
-	$order_info->currency = $currency;
+	if (!($email && $crypto && $currency && $price)){
+	   exit(json_encode(['data.data.error'=>'Something wrong with your order']));
+	}
 
 	try {
-		$transactionData = $mercury->createTransaction($mail,$crypto,$currency,$amount);
+	    $transactionData = $mercury->createTransaction($email,$crypto,$currency,$price);
+
 	}catch (\Exception $exception){
 		header("Content-Type: application/json");
-		exit(json_encode(['status' => 'failed','error'=>'Cant create transaction']));
+		//'status' => 'failed','error'=>'Cant create transaction',
+		exit(json_encode(['data.data.error'=>$exception->getMessage()]));
 	}
 
 	$postData = array(
@@ -97,7 +94,8 @@ if ($ajaxCheckTransaction){
 		$transactionData = $mercury->checkStatus($uuid);
 	}catch (\Exception $exception){
 		header("Content-Type: application/json");
-		exit(json_encode(['status' => 'failed','errorCode'=>$exception->getCode(),'errorMessage'=>$exception->getMessage()]));
+		exit(json_encode(['data.data.error'=>$exception->getMessage()]));
+		//exit(json_encode(['status' => 'failed','errorCode'=>$exception->getCode(),'errorMessage'=>$exception->getMessage()]));
 	}
 
 	$postData = array(
@@ -142,10 +140,15 @@ if ($ajaxCheckTransaction){
 $order_id = $invoiceid;
 $ca->assign('order_id', $order_id);
 $ca->assign('_MERCURYLANG', $_MERCURYLANG);
+$ca->assign('checkStatusInterval', $mercury->getCheckStatusInterval() );
+
 
 $active_crypto_currencies = $mercury->get_currency($currency,$orderAmount);
 if ($active_crypto_currencies) {
-	$ca->assign('active_crypto_currencies', json_encode($active_crypto_currencies));
+//	$ca->assign('active_crypto_currencies', json_encode($active_crypto_currencies));
+	$ca->assign('minbtc', $mercury->getCryptoMinAmount('btc',$currency));
+	$ca->assign('mindash', $mercury->getCryptoMinAmount('dash',$currency));
+	$ca->assign('mineth', $mercury->getCryptoMinAmount('eth',$currency));
 
 }else{
 	echo "<b>Error: No active mercury currencies.</b> <br>

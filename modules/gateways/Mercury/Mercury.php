@@ -28,6 +28,8 @@ class Mercury {
     protected $mercury_currencies_list;
     protected $availableFiatCurrencies = ['USD','EUR'];
 
+    protected $defaultCheckStatusInterval = 2000;
+
     protected $minForCurrencies = array(
         'USD' => array(
             'btc' => array(
@@ -60,7 +62,11 @@ class Mercury {
         )
     );
 
-
+    public $crypto_names_for_QR = [
+        'ETH' => 'ethereum',
+        'BTC' => 'bitcoin',
+        'DASH' => 'dash'
+    ];
     /*
      * Get user configured API key from database
      */
@@ -101,12 +107,18 @@ class Mercury {
         return (integer)(!empty($gatewayParams[$currency.$crypto.'min'])) ? $gatewayParams[$currency.$crypto.'min']: $minSetting[$crypto]['default'];
     }
 
+    /** get checkStatusInterval
+     * @return integer
+     */
+    public function getCheckStatusInterval (){
+        $gatewayParams = getGatewayVariables('mercury');
+        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defaultCheckStatusInterval;
+    }
     /**
      * Create Mercury Transaction
      *
      */
     public function createTransaction($mail,$crypto,$fiat_currency,$amount){
-        //fiat currency - так то by user, но если вдруг есть системная то можно тут поставить
 
         $api_key = new APIKey($this->getPublicKey(), $this->getSecretKey());
         $adapter = new Adapter($api_key, $this->getBaseUrl());
@@ -117,25 +129,30 @@ class Mercury {
             'crypto' => $crypto,
             'fiat' => $fiat_currency,
             'amount' => (float) $amount,
-            'tip' => 1,
+            'tip' => 0,
         ]);
 
         $endpoint->process($transaction->getUuid());
+        $qrCodeText = "";
+        $address = $transaction->getAddress();
+        $amount = $transaction->getCryptoAmount();
+        //get Ctypro name from the list
+        $qrCodeText .= $this->crypto_names_for_QR[$crypto] . ":" . $address . "?";
+        $qrCodeText .= "amount=" . $amount . "&";
+        $qrCodeText .= "cryptoCurrency=" . $crypto;
 
-
-
-        $orderData = [
+        return  [
             'uuid' => $transaction->getUuid(),
             'cryptoAmount' => $transaction->getCryptoAmount(),
             'fiatIsoCode' => $transaction->getFiatIsoCode(),
             'fiatAmount' => $transaction->getFiatAmount(),
-            'rate' => $transaction->getRate(),
             'address' => $transaction->getAddress(),
-            'fee' => $transaction->getFee()
+            'networkFee' => $transaction->getFee(),
+            'exchangeRate' => $transaction->getRate(),
+            'cryptoCurrency'=>$crypto,
+            'qrCodeText' => $qrCodeText,
         ];
 
-
-        return $orderData;
     }
 
     /**
@@ -152,16 +169,23 @@ class Mercury {
 
         return [
             'status' => $status->getStatus(),
+            'confirmations' => $status->getConfirmations(),
+
         ];
     }
 
     public function payInvoiceProcessing($invoiceId,$transactionData){
-        $status = $this->checkStatus($transactionData['uuid']);
-        if ($status['status'] == self::APROVED){
-            $this->payInvoice($invoiceId,$transactionData);
-            return true;
+        if (!$this->isTestMode()){
+            $status = $this->checkStatus($transactionData['uuid']);
+            if ($status['status'] != self::APROVED ) {
+                return false;
+            }
         }
-        return false;
+
+        $this->payInvoice($invoiceId,$transactionData);
+
+        return true;
+
     }
 
     public function payInvoice($invoiceId,$transactionData){
@@ -236,7 +260,7 @@ class Mercury {
      */
     public function get_currency($currency,$orderAmount){
         if (!in_array($currency,$this->availableFiatCurrencies)){
-            //вернуть ошибку что ваша валюта не поддерживается
+            //return empty array if currency is not supported
             return [];
         }
 
@@ -283,27 +307,27 @@ class Mercury {
 	}
 
 
-	/*
-	 * Get URL of the WHMCS installation
-	 */
-	public function getSystemUrl() {
-		return Capsule::table('tblconfiguration')
-				->where('setting', 'SystemURL')
-				->value('value');
-	}
+    /*
+     * Get URL of the WHMCS installation
+     */
+    public function getSystemUrl() {
+        return Capsule::table('tblconfiguration')
+            ->where('setting', 'SystemURL')
+            ->value('value');
+    }
 
 
-	public function getLangFilePath($language=false)	{
-		if ($language && file_exists(dirname(__FILE__) . '/lang/'.$language.'.php')) {
-			$langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
-		}else {
-			global $CONFIG;
-			$language = isset($CONFIG['Language']) ? $CONFIG['Language'] : '';
-			$langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
-			if (!file_exists($langfilepath)) {
-				$langfilepath = dirname(__FILE__) . '/lang/english.php';
-			}
-		}
-		return $langfilepath;
-	}
+    public function getLangFilePath($language=false)	{
+        if ($language && file_exists(dirname(__FILE__) . '/lang/'.$language.'.php')) {
+            $langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
+        }else {
+            global $CONFIG;
+            $language = isset($CONFIG['Language']) ? $CONFIG['Language'] : '';
+            $langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
+            if (!file_exists($langfilepath)) {
+                $langfilepath = dirname(__FILE__) . '/lang/english.php';
+            }
+        }
+        return $langfilepath;
+    }
 }

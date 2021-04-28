@@ -12,9 +12,11 @@
         
  3. Go back to the main directory of repo.Copy all files to your WHMСS root directory  
 
-        `sudo cp -R * /var/www/html/whmcs` 
         
- 4. Open gateways plugins page at admin part of WHMCS, activate plugin,set up Public key and Secret key. . 
+    sudo rsync -avr --exclude='.git'  --exclude='.md'  --exclude='.gitignore'  --exclude='.gitmodules'   *  /var/www/html/whmcs/
+
+        
+ 4. Open gateways plugins page at admin part of WHMCS, activate plugin,set up Public key and Secret key.
 
 
 
