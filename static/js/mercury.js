@@ -7,7 +7,7 @@ $("document").ready(function(){
 
     let mail = $("#email").data("email"),
         amount = $("#amount").data("amount"),
-        order_id = $("#order_id").data("order_id"),
+        orderId = $("#order_id").data("order_id"),
         currency = $("#currency").data("currency"),
         minbtc = $("#minbtc").data("minbtc"),
         mindash = $("#mindash").data("mindash"),
@@ -15,13 +15,10 @@ $("document").ready(function(){
         checkStatusInterval = $("#checkStatusInterval").data("interval");
 
 
-    function successCallback(obj) {
-        window.location = finishOrderUrl(obj);
-    }
     function finishOrderUrl(paymentdata) {
         var params = {};
 
-        params.finish_order = order_id;
+        params.finish_order = orderId;
         params.currencyCode = currency;
         params.paymentAmount = amount;
 
@@ -41,6 +38,10 @@ $("document").ready(function(){
             url += ((url.indexOf("?") === -1) ? "?" : "&") + serializedParams;
         }
         return url;
+    }
+
+    function successCallback(obj) {
+        window.location = finishOrderUrl(obj);
     }
 
     var sdk = new MercurySDK({
