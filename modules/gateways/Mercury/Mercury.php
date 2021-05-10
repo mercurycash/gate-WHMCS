@@ -25,7 +25,7 @@ class Mercury {
     protected $testApiUrl = 'https://api-way.mercurydev.tk';
 
     protected $currenceApiUrl = 'https://api.mercury.cash/api/price';
-    protected $mercury_currencies_list;
+    protected $currenciesList;
     protected $availableFiatCurrencies = ['USD','EUR'];
 
     protected $defStatusInterval = 2000;
@@ -315,7 +315,7 @@ class Mercury {
         $data = $this->getMercuryCurrenceList();
         $data =  $data[$currency];
 
-        foreach ($data as $key => $arr) {
+        foreach ($data as $key) {
             if ($key == 'exchange') continue;
             $data[$key]['cart_amount'] = (float) $orderAmount;
             $data[$key]['minprice'] = $this->getCryptoMinAmount(strtolower($key),$currency);
@@ -329,7 +329,7 @@ class Mercury {
      * @return mixed
      */
     public function getMercuryCurrenceList(){
-        if(empty($this->mercury_currencies_list)) {
+        if(empty($this->currenciesList)) {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $this->currenceApiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -339,9 +339,9 @@ class Mercury {
 
             $body = json_decode($response, true);
 
-            $this->mercury_currencies_list = $body['data'];
+            $this->currenciesList = $body['data'];
         }
-        return $this->mercury_currencies_list;
+        return $this->currenciesList;
     }
 
     /**

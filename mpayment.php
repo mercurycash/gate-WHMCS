@@ -26,55 +26,53 @@ $ca->initPage();
 /*
  * SET POST PARAMETERS TO VARIABLES AND CHECK IF THEY EXIST
  */
-$get_order = $mercury->sanitizeNumber($_REQUEST['get_order']);
-$finishOrder = $mercury->sanitizeNumber($_REQUEST['finish_order']);
+$get_order = htmlspecialchars(isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : "");
+$finishOrder = htmlspecialchars(isset($_REQUEST['finish_order']) ? $_REQUEST['finish_order'] : "");
 
 $system_url = $mercury->getSystemUrl();
 $ca->assign('system_url', $system_url);
 
+$ca->requireLogin(); // Go to login page if not authenticate
+
 
 /// AJAX flags
-$ajaxCreateTransaction = isset($_POST['ajax_create_transaction']);
-$ajaxCheckTransaction = isset($_POST['ajax_check_transaction']);
+$ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;
+$ajaxCheckTransaction = isset($_GET['ajax_check_transaction']) ;
 
-
-$invoiceid = $mercury->sanitizeNumber($_POST['invoiceid']);
-$orderAmount = $mercury->sanitizeNumber($_POST['amount']);
-$billingEmail = $mercury->sanitizeEmail($_POST['email']);
-$currency = $mercury->sanitizeString($_POST['invoice_currency']);
+$invoiceid  = htmlspecialchars(isset($_POST['invoiceid']) ? $_POST['invoiceid'] : "");
+$orderAmount = htmlspecialchars(isset($_POST['amount']) ? $_POST['amount'] : "");
+$billingEmail = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : "");
+$currency = htmlspecialchars(isset($_POST['invoice_currency']) ? $_POST['invoice_currency'] : "");
 
 $ca->assign('amount', $orderAmount);
 $ca->assign('email', $billingEmail);
 
 
-$currentUser = new CurrentUser;
-$user = $currentUser->user();
-if (!$user) {
-	//add to language file
-	echo "There is not an authenticated User.";
-	exit();
-}
-
 $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-    $email =  $mercury->sanitizeEmail($_POST['email']);
-    $crypto = $mercury->sanitizeString($_POST['crypto']);
-    $currency = $mercury->sanitizeString($_POST['currency']);
-    $price =  $mercury->sanitizeNumber($_POST['price']);
+	$email = htmlspecialchars(isset($_POST['email']) ? filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) : false);
+	$crypto = htmlspecialchars(isset($_POST['crypto']) ? filter_var($_POST['crypto'], FILTER_SANITIZE_STRING) : false);
+	$currency = htmlspecialchars(isset($_POST['currency']) ? filter_var($_POST['currency'], FILTER_SANITIZE_STRING)  : false);
+	$price = htmlspecialchars(isset($_POST['price']) ? filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT) : false);
+
+	$postData = array(
+		'status' => 'error',
+		'data' => array(),
+	);
 
 	if (!($email && $crypto && $currency && $price)){
-	   exit(json_encode(['data.data.error'=>'Something wrong with your order']));
+		$postData['data']['error'] = "Something wrong with your order";
+		exit( json_encode($postData) );
 	}
 
 	try {
 	    $transactionData = $mercury->createTransaction($email,$crypto,$currency,$price);
-
 	}catch (Exception $exception){
 		header("Content-Type: application/json");
-		//'status' => 'failed','error'=>'Cant create transaction',
-		exit(json_encode(['data.data.error'=>$exception->getMessage()]));
+		$postData['data']['error'] =  $exception->getMessage();
+		exit( json_encode($postData) );
 	}
 
 	$postData = array(
@@ -90,11 +88,17 @@ if ($ajaxCreateTransaction){
 if ($ajaxCheckTransaction){
 	$uuid = htmlspecialchars(isset($_POST['uuid']) ? $_POST['uuid'] : "");
 
+	$postData = array(
+		'status' => 'error',
+		'data' => array(),
+	);
+
 	try {
 		$transactionData = $mercury->checkStatus($uuid);
 	}catch (Exception $exception){
 		header("Content-Type: application/json");
-		exit(json_encode(['data.data.error'=>$exception->getMessage()]));
+		$postData['data']['error'] =  $exception->getMessage();
+		exit( json_encode($postData) );
 	}
 
 	$postData = array(
@@ -107,27 +111,27 @@ if ($ajaxCheckTransaction){
 }
 
  if($finishOrder){
-     $invoiceId = $finishOrder;
-     $transactionData =[];
-     $transactionData['currencyCode'] = isset($_REQUEST['currencyCode']) ? $mercury->sanitizeString($_REQUEST['currencyCode']) : false;
-     $transactionData['paymentAmount'] = isset($_REQUEST['paymentAmount']) ? $mercury->sanitizeNumber($_REQUEST['paymentAmount']) : false;
-     $transactionData['crypto'] = isset($_REQUEST['crypto']) ? $mercury->sanitizeString($_REQUEST['crypto']) : "";
-     $transactionData['uuid'] = htmlspecialchars(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : "");
-     $transactionData['address'] = htmlspecialchars(isset($_REQUEST['address']) ? $_REQUEST['address'] : "");
-     if ($mercury->payInvoiceProcessing($invoiceId,$transactionData)){
-         //address where paid add to notes
-         $invoiceNote = $_MERCURYLANG['invoiceNote']['paid'].' '.$transactionData['crypto'].' '.$_MERCURYLANG['invoiceNote']['address'].' '.$transactionData['address'];
-         $mercury->updateInvoiceNote($invoiceId, $invoiceNote);
-         $finishUrl = $system_url . 'viewinvoice.php?id=' . $finishOrder . '&paymentsuccess=true';
-     }else{
-         $invoiceNote = $_MERCURYLANG['invoiceNote']['notpaid'].' '.$transactionData['crypto'].' '.$_MERCURYLANG['invoiceNote']['address'].' '.$transactionData['address'].' '.$_MERCURYLANG['invoiceNote']['error'];
-         $mercury->updateInvoiceNote($invoiceId, $invoiceNote);
-         $finishUrl = $system_url . 'viewinvoice.php?id=' . $finishOrder;
-     }
+	$invoiceId = $finishOrder;
+	$transactionData =[];
+	$transactionData['currencyCode'] = htmlspecialchars(isset($_REQUEST['currencyCode']) ? $_REQUEST['currencyCode'] : "");
+	$transactionData['paymentAmount'] = htmlspecialchars(isset($_REQUEST['paymentAmount']) ? $_REQUEST['paymentAmount'] : "");
+	$transactionData['uuid'] = htmlspecialchars(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : "");
+	$transactionData['address'] = htmlspecialchars(isset($_REQUEST['address']) ? $_REQUEST['address'] : "");
+	$transactionData['crypto'] = htmlspecialchars(isset($_REQUEST['crypto']) ? $_REQUEST['crypto'] : "");
 
-     header("Location: $finishUrl");
-     exit();
 
+	if ($mercury->payInvoiceProcessing($invoiceId,$transactionData)){
+		//address where paid add to notes
+		$invoiceNote = $_MERCURYLANG['invoiceNote']['paid'].' '.$transactionData['crypto'].' '.$_MERCURYLANG['invoiceNote']['address'].' '.$transactionData['address'];
+		$mercury->updateInvoiceNote($invoiceId, $invoiceNote);
+		$finishUrl = $system_url . 'viewinvoice.php?id=' . $finishOrder . '&paymentsuccess=true';
+	}else{
+		$invoiceNote = $_MERCURYLANG['invoiceNote']['notpaid'].' '.$transactionData['crypto'].' '.$_MERCURYLANG['invoiceNote']['address'].' '.$transactionData['address'].' '.$_MERCURYLANG['invoiceNote']['error'];
+		$mercury->updateInvoiceNote($invoiceId, $invoiceNote);
+		$finishUrl = $system_url . 'viewinvoice.php?id=' . $finishOrder;
+	}
+	header("Location: $finishUrl");
+    exit();
 }else if(!$invoiceid) {
 	echo "<b>Error: Failed to fetch order data.</b> <br>
 				Note to admin: Please check that your System URL is configured correctly.
@@ -160,3 +164,5 @@ if ($active_crypto_currencies) {
 $ca->setTemplate('../mercury/payment');
 
 $ca->output();
+
+?>

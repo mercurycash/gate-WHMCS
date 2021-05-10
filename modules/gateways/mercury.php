@@ -9,20 +9,17 @@ function mercury_config() {
     // When loading plugin setup page, run custom JS
     add_hook('AdminAreaFooterOutput', 1, function($vars) {
         try {
-            // Detect module name from filename.
-            $gatewayModuleName = basename(__FILE__, '.php');
-            // Fetch gateway configuration parameters.
-            $gatewayParams = getGatewayVariables($gatewayModuleName);
             $mercury = new Mercury();
-
         }
         catch (exception $e) {
-            return;
+            return <<<HTML
+            <script type="text/javascript">
+                alert('Mercury gateway module installed with error, Please check Mercury SDK files inside module directory');
+            </script>
+HTML;
         }
 
-        require($mercury->getLangFilePath());
         $systemUrl = $mercury->getSystemUrl();
-
 
         return <<<HTML
 		<script type="text/javascript">
