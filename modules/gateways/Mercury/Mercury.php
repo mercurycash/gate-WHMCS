@@ -32,7 +32,7 @@ class Mercury {
     protected $mercury_currencies_list;
     protected $availableFiatCurrencies = ['USD','EUR'];
 
-    protected $defaultCheckStatusInterval = 2000;
+    protected $defStatusInterval = 2000;
 
     protected $minForCurrencies = array(
         'USD' => array(
@@ -87,6 +87,7 @@ class Mercury {
 
         return ($this->isTestMode()) ? $gatewayParams['secretKeyTest'] : $gatewayParams['secretKey'];
     }
+
     public function isTestMode(){
         $gatewayParams = getGatewayVariables('mercury');
         return ( $gatewayParams['testMode']) ? true : false;
@@ -115,7 +116,32 @@ class Mercury {
      */
     public function getCheckStatusInterval (){
         $gatewayParams = getGatewayVariables('mercury');
-        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defaultCheckStatusInterval;
+        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defStatusInterval;
+    }
+
+    public function sanitizeString($input){
+        if (empty($input)){
+            return "";
+        }
+
+        $input = trim($input);
+        $input = filter_var($input, FILTER_SANITIZE_STRING);
+
+        return $input;
+    }
+
+    public function sanitizeEmail($input){
+        $input = trim($input);
+        $input = filter_var($input, FILTER_SANITIZE_EMAIL	);
+
+        return $input;
+    }
+
+    public function sanitizeNumber($input){
+        $input = trim($input);
+        $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT);
+
+        return $input;
     }
 
     /**
