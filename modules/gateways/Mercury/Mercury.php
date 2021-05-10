@@ -2,11 +2,11 @@
 
 namespace Mercury;
 
+use WHMCS\Database\Capsule;
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../includes/invoicefunctions.php';
 require_once __DIR__ . '/mercury-cash-sdk/vendor/autoload.php';
 
-use WHMCS\Database\Capsule;
 use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
 use MercuryCash\SDK\Endpoints\Transaction;
@@ -28,7 +28,7 @@ class Mercury {
     protected $currenciesList;
     protected $availableFiatCurrencies = ['USD','EUR'];
 
-    protected $defStatusInterval = 2000;
+    protected $defaultCheckStatusInterval = 2000;
 
     protected $minForCurrencies = array(
         'USD' => array(
@@ -83,7 +83,6 @@ class Mercury {
 
         return ($this->isTestMode()) ? $gatewayParams['secretKeyTest'] : $gatewayParams['secretKey'];
     }
-
     public function isTestMode(){
         $gatewayParams = getGatewayVariables('mercury');
         return ( $gatewayParams['testMode']) ? true : false;
@@ -112,39 +111,7 @@ class Mercury {
      */
     public function getCheckStatusInterval (){
         $gatewayParams = getGatewayVariables('mercury');
-        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defStatusInterval;
-    }
-
-    public function sanitizeString($input){
-        if (!isset($input) OR empty($input)){
-            return "";
-        }
-
-        $input = trim($input);
-        $input = filter_var($input, FILTER_SANITIZE_STRING);
-
-        return $input;
-    }
-
-    public function sanitizeEmail($input){
-        if (!isset($input) OR empty($input)){
-            return "";
-        }
-
-        $input = trim($input);
-        $input = filter_var($input, FILTER_SANITIZE_EMAIL	);
-
-        return $input;
-    }
-
-    public function sanitizeNumber($input){
-        if (!isset($input) OR empty($input)){
-            return "";
-        }
-        $input = trim($input);
-        $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT);
-
-        return $input;
+        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defaultCheckStatusInterval;
     }
 
     /**

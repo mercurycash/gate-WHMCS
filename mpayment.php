@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__) . '/modules/gateways/Mercury/Mercury.php');
 
 use WHMCS\ClientArea;
+use stdClass;
 use WHMCS\Database\Capsule;
 use WHMCS\Authentication\CurrentUser;
 use Mercury\Mercury;
@@ -39,10 +40,10 @@ $ca->requireLogin(); // Go to login page if not authenticate
 $ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;
 $ajaxCheckTransaction = isset($_GET['ajax_check_transaction']) ;
 
-$invoiceid  = htmlspecialchars(isset($_POST['invoiceid']) ? $_POST['invoiceid'] : "");
+$invoiceid  = isset($_POST['invoiceid']) ? filter_var(addslashes($_POST['invoiceid']), FILTER_SANITIZE_NUMBER_INT) : "";
 $orderAmount = htmlspecialchars(isset($_POST['amount']) ? $_POST['amount'] : "");
-$billingEmail = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : "");
-$currency = htmlspecialchars(isset($_POST['invoice_currency']) ? $_POST['invoice_currency'] : "");
+$billingEmail = isset($_POST['email']) ? filter_var(addslashes($_POST['email']), FILTER_SANITIZE_EMAIL) : "";
+$currency = isset($_POST['invoice_currency']) ? filter_var(addslashes($_POST['invoice_currency']), FILTER_SANITIZE_STRING) : "";
 
 $ca->assign('amount', $orderAmount);
 $ca->assign('email', $billingEmail);
@@ -52,10 +53,10 @@ $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-	$email = htmlspecialchars(isset($_POST['email']) ? filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) : false);
-	$crypto = htmlspecialchars(isset($_POST['crypto']) ? filter_var($_POST['crypto'], FILTER_SANITIZE_STRING) : false);
-	$currency = htmlspecialchars(isset($_POST['currency']) ? filter_var($_POST['currency'], FILTER_SANITIZE_STRING)  : false);
-	$price = htmlspecialchars(isset($_POST['price']) ? filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT) : false);
+	$email = isset($_POST['email']) ? filter_var(addslashes($_POST['email']), FILTER_SANITIZE_EMAIL) : false;
+	$crypto = isset($_POST['crypto']) ? filter_var(addslashes($_POST['crypto']), FILTER_SANITIZE_STRING) : false;
+	$currency = isset($_POST['currency']) ? filter_var(addslashes($_POST['currency']), FILTER_SANITIZE_STRING)  : false;
+    $price = htmlspecialchars(isset($_POST['price']) ? $_POST['price'] : false);
 
 	$postData = array(
 		'status' => 'error',
@@ -148,7 +149,6 @@ $ca->assign('checkStatusInterval', $mercury->getCheckStatusInterval() );
 
 $active_crypto_currencies = $mercury->get_currency($currency,$orderAmount);
 if ($active_crypto_currencies) {
-//	$ca->assign('active_crypto_currencies', json_encode($active_crypto_currencies));
 	$ca->assign('minbtc', $mercury->getCryptoMinAmount('btc',$currency));
 	$ca->assign('mindash', $mercury->getCryptoMinAmount('dash',$currency));
 	$ca->assign('mineth', $mercury->getCryptoMinAmount('eth',$currency));
@@ -164,5 +164,3 @@ if ($active_crypto_currencies) {
 $ca->setTemplate('../mercury/payment');
 
 $ca->output();
-
-?>
