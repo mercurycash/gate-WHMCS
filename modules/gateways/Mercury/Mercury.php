@@ -13,6 +13,10 @@ use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
 use MercuryCash\SDK\Endpoints\Transaction;
 
+/**
+ * Class Mercury
+ * @package Mercury
+ */
 class Mercury {
 
     const PENDING = 'TRANSACTION_PENDING';
@@ -62,7 +66,7 @@ class Mercury {
         )
     );
 
-    public $crypto_names_for_QR = [
+    public $qrCryptoNames = [
         'ETH' => 'ethereum',
         'BTC' => 'bitcoin',
         'DASH' => 'dash'
@@ -80,9 +84,8 @@ class Mercury {
      */
     public function getSecretKey() {
         $gatewayParams = getGatewayVariables('mercury');
-        return ($this->isTestMode())?$gatewayParams['secretKeyTest']:$gatewayParams['secretKey'];
 
-        return $gatewayParams['secretKey'];
+        return ($this->isTestMode()) ? $gatewayParams['secretKeyTest'] : $gatewayParams['secretKey'];
     }
     public function isTestMode(){
         $gatewayParams = getGatewayVariables('mercury');
@@ -96,7 +99,7 @@ class Mercury {
         return $this->baseApiUrl;
     }
 
-    /**get minimum value for Crypto Currency
+    /** Get minimum value for Crypto Currency
      * @param $crypto
      * @param $currency
      * @return integer
@@ -114,9 +117,14 @@ class Mercury {
         $gatewayParams = getGatewayVariables('mercury');
         return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defaultCheckStatusInterval;
     }
+
     /**
      * Create Mercury Transaction
-     *
+     * @param $mail
+     * @param $crypto
+     * @param $fiat_currency
+     * @param $amount
+     * @return array
      */
     public function createTransaction($mail,$crypto,$fiat_currency,$amount){
 
@@ -136,8 +144,8 @@ class Mercury {
         $qrCodeText = "";
         $address = $transaction->getAddress();
         $amount = $transaction->getCryptoAmount();
-        //get Ctypro name from the list
-        $qrCodeText .= $this->crypto_names_for_QR[$crypto] . ":" . $address . "?";
+
+        $qrCodeText .= $this->qrCryptoNames[$crypto] . ":" . $address . "?";
         $qrCodeText .= "amount=" . $amount . "&";
         $qrCodeText .= "cryptoCurrency=" . $crypto;
 
@@ -157,7 +165,8 @@ class Mercury {
 
     /**
      * Check Status Mercury Transaction
-     *
+     * @param $uuid
+     * @return array
      */
     public function checkStatus($uuid){
 
@@ -174,6 +183,13 @@ class Mercury {
         ];
     }
 
+    /**
+     * Check
+     *
+     * @param $invoiceId
+     * @param $transactionData
+     * @return bool
+     */
     public function payInvoiceProcessing($invoiceId,$transactionData){
         if (!$this->isTestMode()){
             $status = $this->checkStatus($transactionData['uuid']);
@@ -254,9 +270,11 @@ class Mercury {
 	}
 
 
-    /** currency list prepared for frontend
+    /**currency list prepared for frontend
      *
-     * return currency list prepared for frontend
+     * @param $currency
+     * @param $orderAmount
+     * @return array|mixed
      */
     public function get_currency($currency,$orderAmount){
         if (!in_array($currency,$this->availableFiatCurrencies)){
@@ -297,9 +315,11 @@ class Mercury {
         return $this->mercury_currencies_list;
     }
 
-	/*
-	 * Update invoice note
-	 */
+    /**
+     * Update invoice note
+     * @param $invoiceid
+     * @param $note
+     */
 	public function updateInvoiceNote($invoiceid, $note) {
 		Capsule::table('tblinvoices')
 			->where('id', $invoiceid)

@@ -13,12 +13,13 @@ function mercury_config() {
             $gatewayModuleName = basename(__FILE__, '.php');
             // Fetch gateway configuration parameters.
             $gatewayParams = getGatewayVariables($gatewayModuleName);
+            $mercury = new Mercury();
+
         }
         catch (exception $e) {
             return;
         }
 
-        $mercury = new Mercury();
         require($mercury->getLangFilePath());
         $systemUrl = $mercury->getSystemUrl();
 
