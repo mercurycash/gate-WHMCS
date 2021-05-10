@@ -2,13 +2,11 @@
 
 namespace Mercury;
 
-use Exception;
-use stdClass;
-use WHMCS\Database\Capsule;
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../includes/invoicefunctions.php';
 require_once __DIR__ . '/mercury-cash-sdk/vendor/autoload.php';
 
+use WHMCS\Database\Capsule;
 use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
 use MercuryCash\SDK\Endpoints\Transaction;
@@ -19,8 +17,6 @@ use MercuryCash\SDK\Endpoints\Transaction;
  */
 class Mercury {
 
-    const PENDING = 'TRANSACTION_PENDING';
-    const RECEIVED = 'TRANSACTION_RECEIVED';
     const APROVED = 'TRANSACTION_APROVED';
 
     private  $version = '1.0';
@@ -120,7 +116,7 @@ class Mercury {
     }
 
     public function sanitizeString($input){
-        if (empty($input)){
+        if (!isset($input) OR empty($input)){
             return "";
         }
 
@@ -131,6 +127,10 @@ class Mercury {
     }
 
     public function sanitizeEmail($input){
+        if (!isset($input) OR empty($input)){
+            return "";
+        }
+
         $input = trim($input);
         $input = filter_var($input, FILTER_SANITIZE_EMAIL	);
 
@@ -138,6 +138,9 @@ class Mercury {
     }
 
     public function sanitizeNumber($input){
+        if (!isset($input) OR empty($input)){
+            return "";
+        }
         $input = trim($input);
         $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT);
 

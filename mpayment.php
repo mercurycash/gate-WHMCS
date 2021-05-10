@@ -3,7 +3,6 @@
 require_once(dirname(__FILE__) . '/modules/gateways/Mercury/Mercury.php');
 
 use WHMCS\ClientArea;
-use stdClass;
 use WHMCS\Database\Capsule;
 use WHMCS\Authentication\CurrentUser;
 use Mercury\Mercury;
@@ -39,10 +38,10 @@ $ajaxCreateTransaction = isset($_POST['ajax_create_transaction']);
 $ajaxCheckTransaction = isset($_POST['ajax_check_transaction']);
 
 
-$orderAmount = isset($_POST['invoiceid']) ? $mercury->sanitizeNumber($_REQUEST['invoiceid']) : "";
-$orderAmount = isset($_POST['amount']) ? $mercury->sanitizeNumber($_REQUEST['amount']) : "";
-$billingEmail = isset($_POST['email']) ? $mercury->sanitizeEmail($_REQUEST['email']) : "";
-$currency = isset($_POST['invoice_currency']) ? $mercury->sanitizeString($_REQUEST['invoice_currency']) : "";
+$invoiceid = $mercury->sanitizeNumber($_POST['invoiceid']);
+$orderAmount = $mercury->sanitizeNumber($_POST['amount']);
+$billingEmail = $mercury->sanitizeEmail($_POST['email']);
+$currency = $mercury->sanitizeString($_POST['invoice_currency']);
 
 $ca->assign('amount', $orderAmount);
 $ca->assign('email', $billingEmail);
@@ -60,10 +59,10 @@ $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-    $email = isset($_POST['email']) ? $mercury->sanitizeEmail($_REQUEST['email']) : false;
-    $crypto = isset($_POST['crypto']) ? $mercury->sanitizeString($_REQUEST['crypto']) : false;
-    $currency = isset($_POST['currency']) ? $mercury->sanitizeString($_REQUEST['currency']) : false;
-    $price = isset($_POST['price']) ? $mercury->sanitizeNumber($_REQUEST['price']) : false;
+    $email =  $mercury->sanitizeEmail($_POST['email']);
+    $crypto = $mercury->sanitizeString($_POST['crypto']);
+    $currency = $mercury->sanitizeString($_POST['currency']);
+    $price =  $mercury->sanitizeNumber($_POST['price']);
 
 	if (!($email && $crypto && $currency && $price)){
 	   exit(json_encode(['data.data.error'=>'Something wrong with your order']));
