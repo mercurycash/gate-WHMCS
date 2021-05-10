@@ -35,13 +35,13 @@ $ca->assign('system_url', $system_url);
 
 
 /// AJAX flags
-$ajaxCreateTransaction = htmlspecialchars(isset($_REQUEST['ajax_create_transaction']) ? $_REQUEST['ajax_create_transaction'] : "");
-$ajaxCheckTransaction = htmlspecialchars(isset($_REQUEST['ajax_check_transaction']) ? $_REQUEST['ajax_check_transaction'] : "");
+$ajaxCreateTransaction = htmlspecialchars(isset($_GET['ajax_create_transaction']) ? $_GET['ajax_create_transaction'] : "");
+$ajaxCheckTransaction = htmlspecialchars(isset($_GET['ajax_check_transaction']) ? $_GET['ajax_check_transaction'] : "");
 
-$invoiceid  = htmlspecialchars(isset($_REQUEST['invoiceid']) ? $_REQUEST['invoiceid'] : "");
-$orderAmount = htmlspecialchars(isset($_REQUEST['amount']) ? $_REQUEST['amount'] : "");
-$billingEmail = htmlspecialchars(isset($_REQUEST['email']) ? $_REQUEST['email'] : "");
-$currency = htmlspecialchars(isset($_REQUEST['invoice_currency']) ? $_REQUEST['invoice_currency'] : "");
+$invoiceid  = htmlspecialchars(isset($_POST['invoiceid']) ? $_POST['invoiceid'] : "");
+$orderAmount = htmlspecialchars(isset($_POST['amount']) ? $_POST['amount'] : "");
+$billingEmail = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : "");
+$currency = htmlspecialchars(isset($_POST['invoice_currency']) ? $_POST['invoice_currency'] : "");
 
 $ca->assign('amount', $orderAmount);
 $ca->assign('email', $billingEmail);
@@ -59,10 +59,10 @@ $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-	$email = htmlspecialchars(isset($_REQUEST['email']) ? $_REQUEST['email'] : false);
-	$crypto = htmlspecialchars(isset($_REQUEST['crypto']) ? $_REQUEST['crypto'] : false);
-	$currency = htmlspecialchars(isset($_REQUEST['currency']) ? $_REQUEST['currency'] : false);
-	$price = htmlspecialchars(isset($_REQUEST['price']) ? $_REQUEST['price'] : false);
+	$email = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : false);
+	$crypto = htmlspecialchars(isset($_POST['crypto']) ? $_POST['crypto'] : false);
+	$currency = htmlspecialchars(isset($_POST['currency']) ? $_POST['currency'] : false);
+	$price = htmlspecialchars(isset($_POST['price']) ? $_POST['price'] : false);
 
 	if (!($email && $crypto && $currency && $price)){
 	   exit(json_encode(['data.data.error'=>'Something wrong with your order']));
@@ -88,7 +88,7 @@ if ($ajaxCreateTransaction){
 
 // test ajax
 if ($ajaxCheckTransaction){
-	$uuid = htmlspecialchars(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : "");
+	$uuid = htmlspecialchars(isset($_POST['uuid']) ? $_POST['uuid'] : "");
 
 	try {
 		$transactionData = $mercury->checkStatus($uuid);

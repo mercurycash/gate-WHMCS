@@ -226,7 +226,7 @@ function mercury_link($params) {
         return $_MERCURYLANG['error']['currency']['notsupported'];
     }
 
-    $form = '<form action="' . $form_url . '" method="GET">';
+    $form = '<form action="' . $form_url . '" method="POST">';
 
     $form .= '<input type="hidden" name="invoiceid" value="' . $params['invoiceid']. '"/>';
 
