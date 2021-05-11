@@ -17,14 +17,14 @@ use MercuryCash\SDK\Endpoints\Transaction;
  */
 class Mercury {
 
-    const APROVED = 'TRANSACTION_APROVED';
+    const APPROVED = 'TRANSACTION_APROVED';
 
     private  $version = '1.0';
     protected $baseApiUrl = 'https://api-way.mercurydev.tk';
     protected $isTestMode = null;
     protected $testApiUrl = 'https://api-way.mercurydev.tk';
 
-    protected $currenceApiUrl = 'https://api.mercury.cash/api/price';
+    protected $currenciesApiUrl = 'https://api.mercury.cash/api/price';
     protected $currenciesList;
     protected $availableFiatCurrencies = ['USD','EUR'];
 
@@ -194,7 +194,7 @@ class Mercury {
     public function payInvoiceProcessing($invoiceId,$transactionData){
         if (!$this->isTestMode()){
             $status = $this->checkStatus($transactionData['uuid']);
-            if ($status['status'] != self::APROVED ) {
+            if ($status['status'] != self::APPROVED ) {
                 return false;
             }
         }
@@ -303,7 +303,7 @@ class Mercury {
     public function getMercuryCurrenceList(){
         if(empty($this->currenciesList)) {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->currenceApiUrl);
+            curl_setopt($ch, CURLOPT_URL, $this->currenciesApiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             $response = curl_exec($ch);
             curl_close($ch);
@@ -340,15 +340,15 @@ class Mercury {
 
     public function getLangFilePath($language=false)	{
         if ($language && file_exists(dirname(__FILE__) . '/lang/'.$language.'.php')) {
-            $langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
+            $langFilePath = dirname(__FILE__) . '/lang/'.$language.'.php';
         }else {
             global $CONFIG;
             $language = isset($CONFIG['Language']) ? $CONFIG['Language'] : '';
-            $langfilepath = dirname(__FILE__) . '/lang/'.$language.'.php';
-            if (!file_exists($langfilepath)) {
-                $langfilepath = dirname(__FILE__) . '/lang/english.php';
+            $langFilePath = dirname(__FILE__) . '/lang/'.$language.'.php';
+            if (!file_exists($langFilePath)) {
+                $langFilePath = dirname(__FILE__) . '/lang/english.php';
             }
         }
-        return $langfilepath;
+        return $langFilePath;
     }
 }

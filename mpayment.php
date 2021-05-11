@@ -9,11 +9,13 @@ use WHMCS\Authentication\CurrentUser;
 use Mercury\Mercury;
 
 define('CLIENTAREA', true);
-require 'init.php';
+require_once 'init.php';
 
 // Init Mercury class
 $mercury = new Mercury();
-require($mercury->getLangFilePath(isset($_REQUEST['language']) ? $_REQUEST['language'] : ""));
+
+$lang_file_path =$mercury->getLangFilePath(isset($_REQUEST['language']) ? $_REQUEST['language'] : "");
+require_once($lang_file_path);
 
 $ca = new ClientArea();
 
@@ -27,7 +29,6 @@ $ca->initPage();
 /*
  * SET POST PARAMETERS TO VARIABLES AND CHECK IF THEY EXIST
  */
-$get_order = htmlspecialchars(isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : "");
 $finishOrder = htmlspecialchars(isset($_GET['finishOrder']) ? $_GET['finishOrder'] : "");
 
 $system_url = $mercury->getSystemUrl();
