@@ -71,23 +71,19 @@ $ca->requireLogin(); // Go to login page if not authenticate
 $ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;
 $ajaxCheckTransaction = isset($_GET['ajax_check_transaction']) ;
 
-$invoiceId  = isset($_POST['invoiceid']) ? filter_var(addslashes($_POST['invoiceid']), FILTER_SANITIZE_NUMBER_INT) : "";
-$orderAmount = htmlspecialchars(isset($_POST['amount']) ? $_POST['amount'] : "");
-$billingEmail = isset($_POST['email']) ? filter_var(addslashes($_POST['email']), FILTER_SANITIZE_EMAIL) : "";
-$currency = isset($_POST['invoice_currency']) ? filter_var(addslashes($_POST['invoice_currency']), FILTER_SANITIZE_STRING) : "";
+$invoiceId = isset($_POST['invoiceid']) ? filter_input(INPUT_POST,'invoiceid',FILTER_SANITIZE_NUMBER_INT) : "";
+$orderAmount = isset($_POST['amount']) ? filter_input(INPUT_POST,'amount',FILTER_SANITIZE_STRING) : "";
+$email = isset($_POST['email']) ? filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL) : "";
+$currency = isset($_POST['currency']) ? filter_input(INPUT_POST,'currency',FILTER_SANITIZE_STRING) : "";
 
 $ca->assign('amount', $orderAmount);
-$ca->assign('email', $billingEmail);
-
-
+$ca->assign('email', $email);
 $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-	$email = isset($_POST['email']) ? filter_var(addslashes($_POST['email']), FILTER_SANITIZE_EMAIL) : false;
-	$crypto = isset($_POST['crypto']) ? filter_var(addslashes($_POST['crypto']), FILTER_SANITIZE_STRING) : false;
-	$currency = isset($_POST['currency']) ? filter_var(addslashes($_POST['currency']), FILTER_SANITIZE_STRING)  : false;
-    $price = htmlspecialchars(isset($_POST['price']) ? $_POST['price'] : false);
+    $crypto = isset($_POST['crypto']) ? filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
+    $price = isset($_POST['price']) ? filter_input(INPUT_POST,'price',FILTER_SANITIZE_STRING) : "";
 
 	$postData = array(
 		'status' => 'error',
@@ -118,7 +114,7 @@ if ($ajaxCreateTransaction){
 
 // test ajax
 if ($ajaxCheckTransaction){
-	$uuid = htmlspecialchars(isset($_POST['uuid']) ? $_POST['uuid'] : "");
+    $uuid = isset($_POST['uuid']) ? filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
 
 	$postData = array(
 		'status' => 'error',
@@ -145,11 +141,11 @@ if ($ajaxCheckTransaction){
  if($finishOrder){
 	$invoiceId = $finishOrder;
 	$transactionData =[];
-	$transactionData['currencyCode'] = htmlspecialchars(isset($_REQUEST['currencyCode']) ? $_REQUEST['currencyCode'] : "");
-	$transactionData['paymentAmount'] = htmlspecialchars(isset($_REQUEST['paymentAmount']) ? $_REQUEST['paymentAmount'] : "");
-	$transactionData['uuid'] = htmlspecialchars(isset($_REQUEST['uuid']) ? $_REQUEST['uuid'] : "");
-	$transactionData['address'] = htmlspecialchars(isset($_REQUEST['address']) ? $_REQUEST['address'] : "");
-	$transactionData['crypto'] = htmlspecialchars(isset($_REQUEST['crypto']) ? $_REQUEST['crypto'] : "");
+	$transactionData['currencyCode'] = isset($_POST['currencyCode']) ?  filter_input(INPUT_POST,'currencyCode',FILTER_SANITIZE_STRING) : "";
+    $transactionData['paymentAmount'] = isset($_POST['paymentAmount']) ?  filter_input(INPUT_POST,'paymentAmount',FILTER_SANITIZE_STRING) : "";
+    $transactionData['uuid'] = isset($_POST['uuid']) ?  filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
+    $transactionData['address'] = isset($_POST['address']) ?  filter_input(INPUT_POST,'address',FILTER_SANITIZE_STRING) : "";
+    $transactionData['crypto'] = isset($_POST['crypto']) ?  filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
 
 
 	if ($mercury->payInvoiceProcessing($invoiceId,$transactionData)){

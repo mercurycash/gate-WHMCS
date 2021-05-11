@@ -227,7 +227,7 @@ function mercury_link($params) {
 
     $form .= '<input type="hidden" name="invoiceid" value="' . $params['invoiceid']. '"/>';
 
-    $form .= '<input type="hidden" name="invoice_currency" value="' . $params['currency'] . '"/>';
+    $form .= '<input type="hidden" name="currency" value="' . $params['currency'] . '"/>';
     $form .= '<input type="hidden" name="amount" value="' . $params['amount'] . '"/>';
 
     $form .= '<input type="hidden" name="email" value="' . $params['clientdetails']['email'] . '"/>';
