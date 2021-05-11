@@ -26,9 +26,9 @@ class Mercury {
 
     protected $currenciesApiUrl = 'https://api.mercury.cash/api/price';
     protected $currenciesList;
-    protected $availableFiatCurrencies = ['USD','EUR'];
+    protected $availableFiat = ['USD','EUR'];
 
-    protected $defaultCheckStatusInterval = 2000;
+    protected $defCheckInterval = 2000;
 
     protected $minForCurrencies = array(
         'USD' => array(
@@ -116,7 +116,7 @@ class Mercury {
      */
     public function getCheckStatusInterval (){
         $gatewayParams = getGatewayVariables('mercury');
-        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defaultCheckStatusInterval;
+        return (integer)( $gatewayParams['checkStatusInterval']) ? $gatewayParams['checkStatusInterval'] : $this->defCheckInterval;
     }
 
     /**
@@ -256,7 +256,7 @@ class Mercury {
      * @return bool
      */
     public function isCurrencySupported($currency){
-        return (bool)(in_array($currency,$this->availableFiatCurrencies));
+        return (bool)(in_array($currency,$this->availableFiat));
     }
 
 	/*
@@ -278,7 +278,7 @@ class Mercury {
      * @return array|mixed
      */
     public function get_currency($currency,$orderAmount){
-        if (!in_array($currency,$this->availableFiatCurrencies)){
+        if (!in_array($currency,$this->availableFiat)){
             //return empty array if currency is not supported
             return [];
         }
