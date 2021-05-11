@@ -28,7 +28,7 @@ $ca->initPage();
  * SET POST PARAMETERS TO VARIABLES AND CHECK IF THEY EXIST
  */
 $get_order = htmlspecialchars(isset($_REQUEST['get_order']) ? $_REQUEST['get_order'] : "");
-$finishOrder = htmlspecialchars(isset($_REQUEST['finish_order']) ? $_REQUEST['finish_order'] : "");
+$finishOrder = htmlspecialchars(isset($_GET['finishOrder']) ? $_GET['finishOrder'] : "");
 
 $system_url = $mercury->getSystemUrl();
 $ca->assign('system_url', $system_url);
@@ -40,7 +40,7 @@ $ca->requireLogin(); // Go to login page if not authenticate
 $ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;
 $ajaxCheckTransaction = isset($_GET['ajax_check_transaction']) ;
 
-$invoiceid  = isset($_POST['invoiceid']) ? filter_var(addslashes($_POST['invoiceid']), FILTER_SANITIZE_NUMBER_INT) : "";
+$invoiceId  = isset($_POST['invoiceid']) ? filter_var(addslashes($_POST['invoiceid']), FILTER_SANITIZE_NUMBER_INT) : "";
 $orderAmount = htmlspecialchars(isset($_POST['amount']) ? $_POST['amount'] : "");
 $billingEmail = isset($_POST['email']) ? filter_var(addslashes($_POST['email']), FILTER_SANITIZE_EMAIL) : "";
 $currency = isset($_POST['invoice_currency']) ? filter_var(addslashes($_POST['invoice_currency']), FILTER_SANITIZE_STRING) : "";
@@ -133,7 +133,7 @@ if ($ajaxCheckTransaction){
 	}
 	header("Location: $finishUrl");
     exit();
-}else if(!$invoiceid) {
+}else if(!$invoiceId) {
 	echo "<b>Error: Failed to fetch order data.</b> <br>
 				Note to admin: Please check that your System URL is configured correctly.
 				If you are using SSL, verify that System URL is set to use HTTPS and not HTTP. <br>
@@ -141,8 +141,7 @@ if ($ajaxCheckTransaction){
 	exit;
 }
 
-$order_id = $invoiceid;
-$ca->assign('order_id', $order_id);
+$ca->assign('order_id', $invoiceId);
 $ca->assign('_MERCURYLANG', $_MERCURYLANG);
 $ca->assign('checkStatusInterval', $mercury->getCheckStatusInterval() );
 

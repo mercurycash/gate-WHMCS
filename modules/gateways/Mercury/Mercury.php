@@ -21,7 +21,7 @@ class Mercury {
 
     private  $version = '1.0';
     protected $baseApiUrl = 'https://api-way.mercurydev.tk';
-    protected $isTestMode;
+    protected $isTestMode = null;
     protected $testApiUrl = 'https://api-way.mercurydev.tk';
 
     protected $currenceApiUrl = 'https://api.mercury.cash/api/price';
@@ -84,8 +84,13 @@ class Mercury {
         return ($this->isTestMode()) ? $gatewayParams['secretKeyTest'] : $gatewayParams['secretKey'];
     }
     public function isTestMode(){
+        if ($this->isTestMode !== null){
+            return $this->isTestMode;
+        }
         $gatewayParams = getGatewayVariables('mercury');
-        return ( $gatewayParams['testMode']) ? true : false;
+        $this->isTestMode = ( $gatewayParams['testMode']) ? true : false;
+
+        return $this->isTestMode;
     }
 
     public function getBaseUrl(){

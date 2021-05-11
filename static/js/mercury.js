@@ -18,7 +18,7 @@ $("document").ready(function(){
     function finishOrderUrl(paymentdata) {
         var params = {};
 
-        params.finish_order = orderId;
+        params.finishOrder = orderId;
         params.currencyCode = currency;
         params.paymentAmount = amount;
 
