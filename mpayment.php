@@ -33,8 +33,38 @@ $finishOrder = htmlspecialchars(isset($_GET['finishOrder']) ? $_GET['finishOrder
 $system_url = $mercury->getSystemUrl();
 $ca->assign('system_url', $system_url);
 
-$ca->requireLogin(); // Go to login page if not authenticate
+// test ajax request with Random UUID only for admin
+$ajaxTestTransaction = isset($_POST['ajax_test_transaction']) ;
 
+if ($ajaxTestTransaction){
+
+    $currentUser = new CurrentUser;
+    $user = $currentUser->user();
+    if (!$user) {
+        //add to language file
+        echo $_MERCURYLANG['error']['user']['auth'];
+        exit();
+    }
+    $uuid = htmlspecialchars(isset($_POST['uuid']) ? $_POST['uuid'] : "");
+
+    try {
+        $transactionData = $mercury->checkStatus($uuid);
+    }catch (\Exception $exception){
+        header("Content-Type: application/json");
+        exit(json_encode(['status' => 'failed','errorCode'=>$exception->getCode(),'errorMessage'=>$exception->getMessage()]));
+    }
+
+    $postData = array(
+        'status' => 'success',
+        'data' => $transactionData,
+    );
+
+    header("Content-Type: application/json");
+    exit(json_encode($postData));
+}
+
+//For users
+$ca->requireLogin(); // Go to login page if not authenticate
 
 /// AJAX flags
 $ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;

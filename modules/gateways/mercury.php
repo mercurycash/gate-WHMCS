@@ -107,7 +107,7 @@ HTML;
                         url: ajaxUrl,
                         data: {
                              'uuid': Math.random() * 10000000,
-                            'ajax_check_transaction' : 1,
+                             'ajax_test_transaction' : 1,
                         },
                         dataType: 'json',
                         success: function(data) {
