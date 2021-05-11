@@ -16,6 +16,3 @@
 
         
  4.Open gateways plugins page at admin part of WHMCS, activate a plugin,set up Public key and Secret key.
-
-
-
