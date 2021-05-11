@@ -29,14 +29,13 @@ $ca->initPage();
 /*
  * SET POST PARAMETERS TO VARIABLES AND CHECK IF THEY EXIST
  */
-$finishOrder = htmlspecialchars(isset($_GET['finishOrder']) ? $_GET['finishOrder'] : "");
+$finishOrder = filter_has_var( INPUT_GET, 'finishOrder') ? filter_input(INPUT_POST,'finishOrder',FILTER_SANITIZE_NUMBER_INT) : "";
 
 $system_url = $mercury->getSystemUrl();
 $ca->assign('system_url', $system_url);
 
 // test ajax request with Random UUID only for admin
-$ajaxTestTransaction = isset($_POST['ajax_test_transaction']) ;
-
+$ajaxTestTransaction = filter_has_var( INPUT_POST, 'ajax_test_transaction');
 if ($ajaxTestTransaction){
 
     $currentUser = new CurrentUser;
@@ -46,7 +45,8 @@ if ($ajaxTestTransaction){
         echo $_MERCURYLANG['error']['user']['auth'];
         exit();
     }
-    $uuid = htmlspecialchars(isset($_POST['uuid']) ? $_POST['uuid'] : "");
+
+    $uuid = filter_has_var( INPUT_POST, 'uuid') ? filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
 
     try {
         $transactionData = $mercury->checkStatus($uuid);
@@ -68,13 +68,13 @@ if ($ajaxTestTransaction){
 $ca->requireLogin(); // Go to login page if not authenticate
 
 /// AJAX flags
-$ajaxCreateTransaction = isset($_GET['ajax_create_transaction']) ;
-$ajaxCheckTransaction = isset($_GET['ajax_check_transaction']) ;
+$ajaxCreateTransaction = filter_has_var( INPUT_GET, 'ajax_create_transaction');
+$ajaxCheckTransaction = filter_has_var( INPUT_GET, 'ajax_check_transaction');
 
-$invoiceId = isset($_POST['invoiceid']) ? filter_input(INPUT_POST,'invoiceid',FILTER_SANITIZE_NUMBER_INT) : "";
-$orderAmount = isset($_POST['amount']) ? filter_input(INPUT_POST,'amount',FILTER_SANITIZE_STRING) : "";
-$email = isset($_POST['email']) ? filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL) : "";
-$currency = isset($_POST['currency']) ? filter_input(INPUT_POST,'currency',FILTER_SANITIZE_STRING) : "";
+$invoiceId = filter_has_var(INPUT_POST,'invoiceid') ? filter_input(INPUT_POST,'invoiceid',FILTER_SANITIZE_NUMBER_INT) : "";
+$orderAmount = filter_has_var(INPUT_POST,'amount') ? filter_input(INPUT_POST,'amount',FILTER_SANITIZE_STRING) : "";
+$email = filter_has_var(INPUT_POST,'email') ? filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL) : "";
+$currency = filter_has_var(INPUT_POST,'currency') ? filter_input(INPUT_POST,'currency',FILTER_SANITIZE_STRING) : "";
 
 $ca->assign('amount', $orderAmount);
 $ca->assign('email', $email);
@@ -82,8 +82,8 @@ $ca->assign('currency', $currency);
 
 
 if ($ajaxCreateTransaction){
-    $crypto = isset($_POST['crypto']) ? filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
-    $price = isset($_POST['price']) ? filter_input(INPUT_POST,'price',FILTER_SANITIZE_STRING) : "";
+    $crypto = filter_has_var(INPUT_POST,'crypto') ? filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
+    $price = filter_has_var(INPUT_POST,'price') ? filter_input(INPUT_POST,'price',FILTER_SANITIZE_STRING) : "";
 
 	$postData = array(
 		'status' => 'error',
@@ -114,7 +114,7 @@ if ($ajaxCreateTransaction){
 
 // test ajax
 if ($ajaxCheckTransaction){
-    $uuid = isset($_POST['uuid']) ? filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
+    $uuid = filter_has_var(INPUT_POST,'uuid') ? filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
 
 	$postData = array(
 		'status' => 'error',
@@ -141,11 +141,11 @@ if ($ajaxCheckTransaction){
  if($finishOrder){
 	$invoiceId = $finishOrder;
 	$transactionData =[];
-	$transactionData['currencyCode'] = isset($_POST['currencyCode']) ?  filter_input(INPUT_POST,'currencyCode',FILTER_SANITIZE_STRING) : "";
-    $transactionData['paymentAmount'] = isset($_POST['paymentAmount']) ?  filter_input(INPUT_POST,'paymentAmount',FILTER_SANITIZE_STRING) : "";
-    $transactionData['uuid'] = isset($_POST['uuid']) ?  filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
-    $transactionData['address'] = isset($_POST['address']) ?  filter_input(INPUT_POST,'address',FILTER_SANITIZE_STRING) : "";
-    $transactionData['crypto'] = isset($_POST['crypto']) ?  filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
+	$transactionData['currencyCode'] =  filter_has_var(INPUT_POST,'currencyCode')?  filter_input(INPUT_POST,'currencyCode',FILTER_SANITIZE_STRING) : "";
+    $transactionData['paymentAmount'] = filter_has_var(INPUT_POST,'paymentAmount')?  filter_input(INPUT_POST,'paymentAmount',FILTER_SANITIZE_STRING) : "";
+    $transactionData['uuid'] = filter_has_var(INPUT_POST,'uuid') ?  filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
+    $transactionData['address'] = filter_has_var(INPUT_POST,'address')?  filter_input(INPUT_POST,'address',FILTER_SANITIZE_STRING) : "";
+    $transactionData['crypto'] = filter_has_var(INPUT_POST,'crypto')?  filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
 
 
 	if ($mercury->payInvoiceProcessing($invoiceId,$transactionData)){
