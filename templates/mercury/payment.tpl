@@ -1,4 +1,4 @@
-<link type="text/css" rel="stylesheet" href="static/css/main.css" property="stylesheet" />
+<link type="text/css" rel="stylesheet" href="assets/mercury/static/css/main.min.css" property="stylesheet" />
 
 
 <div id="system-url" data-url="{$system_url}"></div>
@@ -10,7 +10,7 @@
 <div id="checkStatusInterval" data-interval='{$checkStatusInterval}'></div>
 
 
-<div id="minbtc" data-minbtc='{$minbtc}'></div>
+<div id="minbtc" data-minbtc='{$mintc}'></div>
 <div id="mindash" data-mindash='{$mindash}'></div>
 <div id="mineth" data-mineth='{$mineth}'></div>
 
@@ -22,7 +22,7 @@
 <div class="spacer"></div>
 
 
-<script type="text/javascript" src="static/js/main.js"></script>
-<script type="text/javascript" src="static/js/mercury.js"></script>
+<script type="text/javascript" src="assets/mercury/static/js/main.min.js"></script>
+<script type="text/javascript" src="assets/mercury/static/js/mercury.js"></script>
 
 
