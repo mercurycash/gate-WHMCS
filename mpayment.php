@@ -3,7 +3,6 @@
 require_once(dirname(__FILE__) . '/modules/gateways/Mercury/Mercury.php');
 
 use WHMCS\ClientArea;
-use stdClass;
 use WHMCS\Database\Capsule;
 use WHMCS\Authentication\CurrentUser;
 use Mercury\Mercury;
