@@ -1,5 +1,0 @@
-[submodule "modules/gateways/Mercury/mercury-cash-sdk"]
-	path = modules/gateways/Mercury/mercury-cash-sdk
-	url = https://github.com/mercurycash/gate-plugins-sdk.git
-	branch = main
-

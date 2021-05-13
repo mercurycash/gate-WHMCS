@@ -5,7 +5,7 @@ namespace Mercury;
 use WHMCS\Database\Capsule;
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../includes/invoicefunctions.php';
-require_once __DIR__ . '/mercury-cash-sdk/vendor/autoload.php';
+require_once __DIR__ . '/gate-plugins-sdk/vendor/autoload.php';
 
 use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
