@@ -174,7 +174,7 @@ class Mercury {
     public function checkStatus($uuid){
 
         $api_key = new APIKey($this->getPublicKey(), $this->getSecretKey());
-        $adapter = new Adapter($api_key, $this->baseApiUrl);
+        $adapter = new Adapter($api_key, $this->getBaseUrl());
         $endpoint = new Transaction($adapter);
 
         $status = $endpoint->status($uuid);
