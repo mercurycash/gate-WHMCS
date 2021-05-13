@@ -20,15 +20,17 @@ class Mercury {
     const APPROVED = 'TRANSACTION_APROVED';
 
     private  $version = '1.0';
-    protected $baseApiUrl = 'https://api-way.mercurydev.tk';
     protected $isTestMode = null;
-    protected $testApiUrl = 'https://api-way.mercurydev.tk';
 
-    protected $currenciesApiUrl = 'https://api.mercury.cash/api/price';
+    protected $baseApiUrl = 'https://api-way.mercury.cash';
+    protected $testApiUrl = 'https://api-way.mercurydev.tk';
+    protected $priceUrl = 'https://prices.mercury.cash/prices';
+    protected $testPriceUrl = 'https://api.mercury.cash/api/price';
+
     protected $currenciesList;
     protected $availableFiat = ['USD','EUR'];
-
     protected $defCheckInterval = 2000;
+
 
     protected $minForCurrencies = array(
         'USD' => array(
@@ -301,9 +303,15 @@ class Mercury {
      * @return mixed
      */
     public function getMercuryCurrenceList(){
+
+        $priceUrl = ($this->isTestMode()) ? $this->testPriceUrl: $this->priceUrl;
+
         if(empty($this->currenciesList)) {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->currenciesApiUrl);
+            if ($this->isTestMode()){
+
+            }
+            curl_setopt($ch, CURLOPT_URL, $priceUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             $response = curl_exec($ch);
             curl_close($ch);
