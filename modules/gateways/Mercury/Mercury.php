@@ -10,6 +10,8 @@ require_once __DIR__ . '/gate-plugins-sdk/vendor/autoload.php';
 use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
 use MercuryCash\SDK\Endpoints\Transaction;
+use GuzzleHttp\Client;
+
 
 /**
  * Class Mercury
@@ -285,8 +287,12 @@ class Mercury {
             return [];
         }
 
-        // invoice amount in payment file
-        $data = $this->getMercuryCurrenceList();
+        try {
+            $data = $this->getMercuryCurrenceList();
+        }catch (Exception $exception){
+            return [];
+        }
+
         $data =  $data[$currency];
 
         foreach ($data as $key) {
@@ -307,14 +313,14 @@ class Mercury {
         $priceUrl = ($this->isTestMode()) ? $this->testPriceUrl: $this->priceUrl;
 
         if(empty($this->currenciesList)) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $priceUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            $response = curl_exec($ch);
-            curl_close($ch);
 
+            $client =  new Client([
+                'Accept' => 'application/json'
+            ]);
 
-            $body = json_decode($response, true);
+            $response =  $client->request('GET', $priceUrl);
+
+            $body = json_decode($response->getBody(), true);
 
             $this->currenciesList = $body['data'];
         }
