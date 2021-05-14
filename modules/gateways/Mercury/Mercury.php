@@ -308,9 +308,6 @@ class Mercury {
 
         if(empty($this->currenciesList)) {
             $ch = curl_init();
-            if ($this->isTestMode()){
-
-            }
             curl_setopt($ch, CURLOPT_URL, $priceUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             $response = curl_exec($ch);
