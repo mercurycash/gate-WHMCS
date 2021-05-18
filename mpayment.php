@@ -38,7 +38,7 @@ $ajaxTestTransaction = filter_has_var( INPUT_POST, 'ajax_test_transaction');
 if ($ajaxTestTransaction){
 
     $currentUser = new CurrentUser;
-    $user = $currentUser->user();
+    $user = $currentUser->isAuthenticatedAdmin();
     if (!$user) {
         //add to language file
         echo $_MERCURYLANG['error']['user']['auth'];
