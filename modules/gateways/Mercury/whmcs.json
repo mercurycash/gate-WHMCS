@@ -1,0 +1,29 @@
+{
+  "schema": "1.0",
+  "type": "whmcs-gateways",
+  "name": "Mercury",
+  "license": "proprietary",
+  "category": "gateways",
+  "description": {
+    "name": "Mercury",
+    "tagline": "The Mercury Cash digital.",
+    "long": "The Mercury Cash digital wallet allows you to access all the functions of traditional banking and crypto banking in one place",
+    "features": [
+      "Make payments by crypto currencies",
+      "Create up to 10 wallets of each cryptocurrency (BTC/DASH/ETH)"
+    ]
+  },
+  "support": {
+    "homepage": "https:\/\/www.mercury.cash\/",
+    "learn_more": "https:\/\/www.mercury.cash\/products\/gate\/",
+    "email": "support@mercury.cash",
+    "support_url": "https:\/\/support.mercury.cash\/",
+    "docs_url": "https:\/\/docs.whmcs.com\/Notifications"
+  },
+  "authors": [
+    {
+      "name": "Mercury Cash",
+      "homepage": "https:\/\/www.mercury.cash\/"
+    }
+  ]
+}
