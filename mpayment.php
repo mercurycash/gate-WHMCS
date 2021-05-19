@@ -64,7 +64,12 @@ if ($ajaxTestTransaction){
 }
 
 //For users
-$ca->requireLogin(); // Go to login page if not authenticate
+$currentUser = new CurrentUser;
+$user = $currentUser->isAuthenticatedUser();
+if (!$user) {
+    // Go to login page if not authenticate
+    $ca->requireLogin();
+}
 
 /// AJAX flags
 $ajaxCreateTransaction = filter_has_var( INPUT_GET, 'ajax_create_transaction');
