@@ -222,13 +222,11 @@ function mercury_link($params) {
         //You currency is not supported
         return $_MERCURYLANG['error']['currency']['notsupported'];
     }
+    $orderHash = $mercury->getOrderHash($params['invoiceid'], $params['amount'] , $params['currency']);
 
-    $form = '<form action="' . $form_url . '" method="POST">';
+    $form = '<form action="' . $form_url . '" method="GET">';
 
-    $form .= '<input type="hidden" name="invoiceid" value="' . $params['invoiceid']. '"/>';
-
-    $form .= '<input type="hidden" name="currency" value="' . $params['currency'] . '"/>';
-    $form .= '<input type="hidden" name="amount" value="' . $params['amount'] . '"/>';
+    $form .= '<input type="hidden" name="orderHash" value="' . $orderHash. '"/>';
 
     $form .= '<input type="hidden" name="email" value="' . $params['clientdetails']['email'] . '"/>';
 

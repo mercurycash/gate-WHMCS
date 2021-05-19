@@ -28,7 +28,7 @@ $ca->initPage();
 /*
  * SET POST PARAMETERS TO VARIABLES AND CHECK IF THEY EXIST
  */
-$finishOrder = filter_has_var( INPUT_GET, 'finishOrder') ? filter_input(INPUT_POST,'finishOrder',FILTER_SANITIZE_NUMBER_INT) : "";
+$finishOrder = filter_has_var( INPUT_GET, 'finishOrder') ? filter_input(INPUT_GET,'finishOrder',FILTER_SANITIZE_NUMBER_INT) : "";
 
 $system_url = $mercury->getSystemUrl();
 $ca->assign('system_url', $system_url);
@@ -70,17 +70,27 @@ $ca->requireLogin(); // Go to login page if not authenticate
 $ajaxCreateTransaction = filter_has_var( INPUT_GET, 'ajax_create_transaction');
 $ajaxCheckTransaction = filter_has_var( INPUT_GET, 'ajax_check_transaction');
 
-$invoiceId = filter_has_var(INPUT_POST,'invoiceid') ? filter_input(INPUT_POST,'invoiceid',FILTER_SANITIZE_NUMBER_INT) : "";
-$orderAmount = filter_has_var(INPUT_POST,'amount') ? filter_input(INPUT_POST,'amount',FILTER_SANITIZE_STRING) : "";
-$email = filter_has_var(INPUT_POST,'email') ? filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL) : "";
-$currency = filter_has_var(INPUT_POST,'currency') ? filter_input(INPUT_POST,'currency',FILTER_SANITIZE_STRING) : "";
+$orderHash = filter_has_var(INPUT_GET,'orderHash') ? filter_input(INPUT_GET,'orderHash',FILTER_SANITIZE_STRING) : "";
+$orderInfo = $mercury->decryptHash($orderHash);
+
+$invoiceId = $orderInfo->id_order;
+$orderAmount = $orderInfo->value;
+$currency = $orderInfo->currency;
+$email = filter_has_var(INPUT_GET,'email') ? filter_input(INPUT_GET,'email',FILTER_SANITIZE_EMAIL) : "";
 
 $ca->assign('amount', $orderAmount);
-$ca->assign('email', $email);
 $ca->assign('currency', $currency);
+$ca->assign('order_id', $invoiceId);
+
+$ca->assign('email', $email);
+$ca->assign('_MERCURYLANG', $_MERCURYLANG);
+$ca->assign('checkStatusInterval', $mercury->getCheckStatusInterval() );
 
 
 if ($ajaxCreateTransaction){
+    $email = filter_has_var(INPUT_POST,'email') ? filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL) : "";
+    $currency = filter_has_var(INPUT_POST,'currency') ? filter_input(INPUT_POST,'currency',FILTER_SANITIZE_STRING) : "";
+
     $crypto = filter_has_var(INPUT_POST,'crypto') ? filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
     $price = filter_has_var(INPUT_POST,'price') ? filter_input(INPUT_POST,'price',FILTER_SANITIZE_STRING) : "";
 
@@ -140,11 +150,11 @@ if ($ajaxCheckTransaction){
  if($finishOrder){
 	$invoiceId = $finishOrder;
 	$transactionData =[];
-	$transactionData['currencyCode'] =  filter_has_var(INPUT_POST,'currencyCode')?  filter_input(INPUT_POST,'currencyCode',FILTER_SANITIZE_STRING) : "";
-    $transactionData['paymentAmount'] = filter_has_var(INPUT_POST,'paymentAmount')?  filter_input(INPUT_POST,'paymentAmount',FILTER_SANITIZE_STRING) : "";
-    $transactionData['uuid'] = filter_has_var(INPUT_POST,'uuid') ?  filter_input(INPUT_POST,'uuid',FILTER_SANITIZE_STRING) : "";
-    $transactionData['address'] = filter_has_var(INPUT_POST,'address')?  filter_input(INPUT_POST,'address',FILTER_SANITIZE_STRING) : "";
-    $transactionData['crypto'] = filter_has_var(INPUT_POST,'crypto')?  filter_input(INPUT_POST,'crypto',FILTER_SANITIZE_STRING) : "";
+	$transactionData['currencyCode'] =  filter_has_var(INPUT_GET,'currencyCode')?  filter_input(INPUT_GET,'currencyCode',FILTER_SANITIZE_STRING) : "";
+    $transactionData['paymentAmount'] = filter_has_var(INPUT_GET,'paymentAmount')?  filter_input(INPUT_GET,'paymentAmount',FILTER_SANITIZE_STRING) : "";
+    $transactionData['uuid'] = filter_has_var(INPUT_GET,'uuid') ?  filter_input(INPUT_GET,'uuid',FILTER_SANITIZE_STRING) : "";
+    $transactionData['address'] = filter_has_var(INPUT_GET,'address')?  filter_input(INPUT_GET,'address',FILTER_SANITIZE_STRING) : "";
+    $transactionData['crypto'] = filter_has_var(INPUT_GET,'crypto')?  filter_input(INPUT_GET,'crypto',FILTER_SANITIZE_STRING) : "";
 
 
 	if ($mercury->payInvoiceProcessing($invoiceId,$transactionData)){
@@ -166,11 +176,6 @@ if ($ajaxCheckTransaction){
 				To configure System URL, please go to WHMCS admin > Setup > General Settings > General";
 	exit;
 }
-
-$ca->assign('order_id', $invoiceId);
-$ca->assign('_MERCURYLANG', $_MERCURYLANG);
-$ca->assign('checkStatusInterval', $mercury->getCheckStatusInterval() );
-
 
 $active_crypto_currencies = $mercury->get_currency($currency,$orderAmount);
 if ($active_crypto_currencies) {

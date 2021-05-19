@@ -11,6 +11,7 @@ use MercuryCash\SDK\Adapter;
 use MercuryCash\SDK\Auth\APIKey;
 use MercuryCash\SDK\Endpoints\Transaction;
 use GuzzleHttp\Client;
+use StdClass;
 
 
 /**
@@ -362,4 +363,71 @@ class Mercury {
         }
         return $langFilePath;
     }
+
+    /**
+     * Decrypts a string using the application secret.
+     * @param $hash
+     * @return object
+     */
+    public function decryptHash($hash){
+        $encryption_algorithm = 'AES-128-CBC';
+        $hashing_algorith = 'sha256';
+        $secret = $this->getSecretKey();
+        // prevent decrypt failing when $hash is not hex or has odd length
+        if (strlen($hash) % 2 || ! ctype_xdigit($hash)) {
+            return '';
+        }
+
+        // we'll need the binary cipher
+        $binaryInput = hex2bin($hash);
+        $iv = substr($secret, 0, 16);
+        $cipherText = $binaryInput;
+        $key = hash($hashing_algorith, $secret, true);
+
+        $decrypted = openssl_decrypt(
+            $cipherText,
+            $encryption_algorithm,
+            $key,
+            OPENSSL_RAW_DATA,
+            $iv
+        );
+        $parts = explode(':', $decrypted);
+        $order_info = new stdClass();
+        $order_info->id_order = intval($parts[0]);
+        $order_info->value = floatval($parts[1]);
+        $order_info->currency = $parts[2];
+        return $order_info;
+    }
+
+    /**
+     * Encrypts a string using the application secret. This returns a hex representation of the binary cipher text
+     * @param $input
+     * @return string
+     */
+    public function encryptHash($input){
+        $encryption_algorithm = 'AES-128-CBC';
+        $hashing_algorith = 'sha256';
+        $secret = $this->getSecretKey();
+        $key = hash($hashing_algorith, $secret, true);
+        $iv = substr($secret, 0, 16);
+
+        $cipherText = openssl_encrypt(
+            $input,
+            $encryption_algorithm,
+            $key,
+            OPENSSL_RAW_DATA,
+            $iv
+        );
+
+        return bin2hex($cipherText);
+    }
+
+    /*
+     * Add a new skeleton order in the db
+     */
+    public function getOrderHash($id_order, $amount, $currency)
+    {
+        return $this->encryptHash($id_order . ":" . $amount . ":" . $currency);
+    }
+
 }

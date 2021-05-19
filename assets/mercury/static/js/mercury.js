@@ -1,22 +1,23 @@
 $("document").ready(function(){
-    var systemUrl = $("#system-url").data("url");
-    var ajaxUrl = systemUrl + "mpayment.php";
-    var createTransactionUrl = ajaxUrl + "?ajax_create_transaction=true";
-    var checkTransactionUrl = ajaxUrl + "?ajax_check_transaction=true";
+    const systemUrl = $("#system-url").data("url");
+    const staticPath = systemUrl + "assets/mercury";
+    const ajaxUrl = systemUrl + "mpayment.php";
+    const createTransactionUrl = ajaxUrl + "?ajax_create_transaction=true";
+    const checkTransactionUrl = ajaxUrl + "?ajax_check_transaction=true";
 
 
-    let mail = $("#email").data("email"),
+    const mail = $("#email").data("email"),
         amount = $("#amount").data("amount"),
         orderId = $("#order_id").data("order_id"),
         currency = $("#currency").data("currency"),
         minbtc = $("#minbtc").data("minbtc"),
         mindash = $("#mindash").data("mindash"),
         mineth = $("#mineth").data("mineth"),
-        checkStatusInterval = $("#checkStatusInterval").data("interval");
+        checkStatusIntervalVar = $("#checkStatusInterval").data("interval");
 
 
     function finishOrderUrl(paymentdata) {
-        var params = {};
+        let params = {};
 
         params.finishOrder = orderId;
         params.currencyCode = currency;
@@ -47,8 +48,9 @@ $("document").ready(function(){
     var sdk = new MercurySDK({
         checkoutUrl: createTransactionUrl,
         statusUrl: checkTransactionUrl,
-        checkStatusInterval: checkStatusInterval,
+        checkStatusInterval: checkStatusIntervalVar,
         mount: "#mercury-cash",
+        staticUrl: staticPath,
         lang: "en",
         limits: {
             BTC: minbtc,
