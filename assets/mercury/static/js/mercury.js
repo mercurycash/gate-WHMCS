@@ -16,21 +16,23 @@ $("document").ready(function(){
         checkStatusIntervalVar = $("#checkStatusInterval").data("interval");
 
 
-    function finishOrderUrl(paymentdata) {
+    function finishOrderUrl(paymentData,cancelOrder) {
         let params = {};
+
+        params.cancelOrder = cancelOrder;
 
         params.finishOrder = orderId;
         params.currencyCode = currency;
         params.paymentAmount = amount;
 
 
-        params.uuid = paymentdata.uuid;
-        params.address = paymentdata.address;
-        params.crypto = paymentdata.cryptoCurrency;
+        params.uuid = paymentData.uuid;
+        params.address = paymentData.address;
+        params.crypto = paymentData.cryptoCurrency;
 
-        params.confirmations = paymentdata.confirmations;
-        params.cryptoAmount = paymentdata.cryptoAmount;
-        params.status = paymentdata.status;
+        params.confirmations = paymentData.confirmations;
+        params.cryptoAmount = paymentData.cryptoAmount;
+        params.status = paymentData.status;
 
 
         let url = window.location.pathname;
@@ -42,7 +44,11 @@ $("document").ready(function(){
     }
 
     function successCallback(obj) {
-        window.location = finishOrderUrl(obj);
+        window.location = finishOrderUrl(obj,0);
+    }
+
+    function returnToInvoice(obj){
+        window.location = finishOrderUrl(obj,1);
     }
 
     var sdk = new MercurySDK({
@@ -65,7 +71,7 @@ $("document").ready(function(){
         if(obj.status && (obj.status === "TRANSACTION_APROVED" )) {
             successCallback(obj);
         }else{
-             window.history.go(-1);
+            returnToInvoice(obj);
         }
     });
 });
